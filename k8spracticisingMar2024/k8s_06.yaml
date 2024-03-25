@@ -1,0 +1,105 @@
+# This is to create nginx docker container
+# create namespaece + Deployment + NodePOrt service
+# adding sidecar container for php servies
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nsmyng
+  labels:
+    area: myng
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    events {
+    }
+    http {
+      server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        
+        # Set nginx to serve files from the shared volume!
+        root /var/www/html;
+        server_name _;
+        location / {
+          try_files $uri $uri/ =404;
+        }
+        location ~ \.php$ {
+          include fastcgi_params;
+          fastcgi_param REQUEST_METHOD $request_method;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          fastcgi_pass 127.0.0.1:9000;
+        }
+      }
+    }
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svcmyngnprt
+  namespace: nsmyng
+spec:
+  type: NodePort
+  selector:
+    area: myng
+  ports:
+  - name: httpport
+    port: 8080
+    targetPort: 80
+    nodePort: 30080
+  - name: healthport
+    port: 9090
+    targetPort: 90
+    nodePort: 30090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webproddeployment
+  namespace: nsmyng
+  labels:
+    area: myng
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      area: myng
+  template:
+    metadata:
+      labels:
+        area: myng
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/conf.d
+      - name: php-fpm
+        image: php:7.4-fpm
+        resources:
+        limits:
+          memory: 512Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+        volumeMounts:
+          - name: php-code
+            mountPath: /var/www/html
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-configmap
+        - name: php-code
+          emptyDir: {}
+
+
+## This is not running yet as giving error; FailedMount  61s (x9 over 3m9s)  kubelet MountVolume.SetUp failed for volume "nginx-config" : configmap "nginx-config

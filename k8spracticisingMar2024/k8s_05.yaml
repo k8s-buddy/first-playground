@@ -1,0 +1,58 @@
+# This is to create nginx docker container
+# create namespaece + Deployment + NodePOrt service
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nsmyng
+  labels:
+    area: myng
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svcmyngnprt
+  namespace: nsmyng
+spec:
+  type: NodePort
+  selector:
+    area: myng
+  ports:
+  - name: httpport
+    port: 8080
+    targetPort: 80
+    nodePort: 30080
+  - name: heatlhport
+    port: 9090
+    targetPort: 90
+    nodePort: 30090
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webproddeployment
+  namespace: nsmyng
+  labels:
+    area: myng
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      area: myng
+  template:
+    metadata:
+      labels:
+        area: myng
+    spec:
+      containers:
+      - name: mynginx
+        image: connectamitgupta/mynginx:latest
+        resources:
+        limits:
+          memory: 512Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+# it was working fine..

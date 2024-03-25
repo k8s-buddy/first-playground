@@ -1,0 +1,45 @@
+# This is to create nginx docker container
+# create namespaece + mynginx pod + cluset IP service
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nsmyng
+  labels:
+    name: myng
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svcmyng01
+  namespace: nsmyng
+spec:
+  selector:
+    app: myng
+  ports:
+  - name: httpport
+    port: 8080
+    targetPort: 80
+  - name: heathport
+    port: 9090
+    targetPort: 90
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webprod02
+  namespace: nsmyng
+  labels:
+    name: myng
+spec:
+  containers:
+  - name: mynginx
+    image: connectamitgupta/mynginx:latest
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: "1"
+      requests:
+        memory: 256Mi
+        cpu: "0.2"

@@ -1,0 +1,83 @@
+# This is to create nginx docker container
+# create namespaece + nginx normal container  + NodePOrt service
+# adding seperate volume with configmap to serve static html files
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nsmyng
+  labels:
+    area: myng
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: index-html-configmap
+  namespace: nsmyng
+data:
+  index.html: |
+    <html>
+    <h1>Yayy! Looks like you found my Kube webpage! by Amit Gupta <?php echo $_SERVER["REMOTE_ADDR"]; ?></h1>
+    </br>
+    </html
+    <h1>This web page is housed on a Pod running Nginx</h1>
+    </html 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svcmyngnprt
+  namespace: nsmyng
+spec:
+  type: NodePort
+  selector:
+    area: myng
+  ports:
+  - name: httpport
+    port: 8080
+    targetPort: 80
+    nodePort: 30080
+  - name: healthport
+    port: 9090
+    targetPort: 90
+    nodePort: 30090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webproddeployment
+  namespace: nsmyng
+  labels:
+    area: myng
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      area: myng
+  template:
+    metadata:
+      labels:
+        area: myng
+    spec:
+      containers:
+        - name: nginx
+          image: connectamitgupta/mynginx:latest
+          ports:
+          - containerPort: 80
+          volumeMounts:
+          - name: nginx-index-file
+            mountPath: /usr/share/nginx/html/
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+      volumes:
+        - name: nginx-index-file
+          configMap:
+            name: index-html-configmap
+
+
+## this is working absolutely fine except php code... so next work is to add php support also in it

@@ -1,0 +1,24 @@
+services:
+  frontend:
+    restart: always
+    image: devopsedu/employee
+    ports:
+      - 8888:8888
+    stdin_open: true
+    # restart: always
+    networks:
+      - react-mongo
+    depends_on:
+      - mongo
+
+  mongo:
+    restart: always
+    image: mongo:4.2.0
+    volumes:
+      - ./data:/data/db
+    networks:
+      - react-mongo
+    expose:
+      - 27017
+networks:
+  react-mongo:

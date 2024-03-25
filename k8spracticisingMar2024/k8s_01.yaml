@@ -1,0 +1,19 @@
+# This is to create nginx docker container
+# mynginx
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webprod
+  labels:
+    name: mynginxapp
+spec:
+  containers:
+  - name: mynginx
+    image: connectamitgupta/mynginx:latest
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: "1"
+      requests:
+        memory: 256Mi
+        cpu: "0.2"

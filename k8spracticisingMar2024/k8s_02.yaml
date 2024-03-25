@@ -1,0 +1,35 @@
+# This is to create nginx docker container
+# mynginx pod + clusterIP service
+apiVersion: v1
+kind: Service
+metadata:
+  name: myservice02
+spec:
+  selector:
+    app: mynginxapp
+  ports:
+  - name: httpport
+    port: 8080
+    targetPort: 80
+  - name: heathport
+    port: 9090
+    targetPort: 90
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webprod02
+  labels:
+    name: mynginxapp
+spec:
+  containers:
+  - name: mynginx
+    image: connectamitgupta/mynginx:latest
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: "1"
+      requests:
+        memory: 256Mi
+        cpu: "0.2"

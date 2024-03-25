@@ -1,0 +1,53 @@
+########## Imperaive commands ###############################
+
+kubectl run nginx --image=nginx --restart=Never
+
+kubectl describe  pod nginx
+
+kubectl delete pod nginx
+
+kubectl api-resources
+
+################################################################################################
+# Installing Kubernetes with a Windows Node
+Reference: https://eviatargerzi.medium.com/installing-kubernetes-with-a-windows-node-a256f47ad85a
+
+## When done, we want to make sure that our node is ready and all the pods are running without errors:
+
+
+
+##################################
+## Cluster ##################
+  kubectl cluster-info
+
+Display clusters defined in the kubeconfig.
+  kubectl config get-clusters [flags]
+
+ kubectl cluster-info --context kind-simple-cluster
+
+##################################
+## PODS ##################
+kubectl get pods --all-namespaces
+kubectl get nodes -o wide
+
+kubectl get pods --show-labels
+#################################################################################################
+####### Run kubernetes clusters locally in windows ##############################################
+Reference_link: https://www.red-gate.com/simple-talk/devops/containers-and-virtualization/run-kubernetes-clusters-locally-windows/
+
+
+####################################
+## namespace #############
+  kubectl get namespace
+
+###################################################################################################
+###############3  important #######################################################################
+############ how many clusters ##########################
+https://learnk8s.io/how-many-clusters
+https://learnk8s.io/kubernetes-node-size
+https://www.aquasec.com/cloud-native-academy/kubernetes-101/kubernetes-complete-guide/
+
+
+#################################################################################################
+################# network calio ###############
+https://docs.tigera.io/calico/latest/getting-started/kubernetes/kind
